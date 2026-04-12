@@ -60,6 +60,8 @@ wipe-tcc:
 clean:
 	swift package clean
 	rm -rf .build
+	rm -rf App/AppIcon.iconset
+	rm -f App/AppIcon.icns
 
 .PHONY: help
 help:
@@ -77,4 +79,4 @@ help:
 	@echo "  make run      swift run $(APP_NAME) (dev mode, no bundle)"
 	@echo ""
 	@echo "  make wipe-tcc Quit app and reset Accessibility grant for $(BUNDLE_ID)"
-	@echo "  make clean    Remove .build"
+	@echo "  make clean    Remove .build and generated icon"
