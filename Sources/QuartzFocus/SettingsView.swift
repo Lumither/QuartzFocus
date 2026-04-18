@@ -20,6 +20,13 @@ struct SettingsView: View {
                         get: { model.statusBarVisible },
                         set: { model.setStatusBarVisible($0) }
                     ))
+
+                Toggle(
+                    "Center mouse on focused window",
+                    isOn: Binding(
+                        get: { model.centerMouseOnFocus },
+                        set: { model.setCenterMouseOnFocus($0) }
+                    ))
             } header: {
                 Text("General")
             }

@@ -8,6 +8,7 @@ public final class AppModel {
     public private(set) var borderTrigger: BorderTrigger = .hotkey
     public private(set) var isDimEnabled: Bool = false
     public private(set) var dimOpacity: CGFloat = 0.55
+    public private(set) var centerMouseOnFocus: Bool = false
     public private(set) var statusBarVisible: Bool = true
     public private(set) var permissionGranted: Bool = false
     public private(set) var hotkeys: [Direction: HotkeyBinding] = HotkeyBinding.defaults
@@ -48,6 +49,7 @@ public final class AppModel {
         isDimEnabled = focusModeStore.isDimEnabled
         dimOpacity = focusModeStore.dimOpacity
         hotkeys = focusModeStore.hotkeys
+        centerMouseOnFocus = focusModeStore.centerMouseOnFocus
         statusBarVisible = focusModeStore.statusBarVisible
         launchAtLoginEnabled = LaunchAtLoginService.isEnabled
 
@@ -118,6 +120,11 @@ public final class AppModel {
         } else {
             registerHotkeys()
         }
+    }
+
+    public func setCenterMouseOnFocus(_ enabled: Bool) {
+        centerMouseOnFocus = enabled
+        focusModeStore.setCenterMouseOnFocus(enabled)
     }
 
     public func setStatusBarVisible(_ visible: Bool) {
@@ -252,6 +259,10 @@ public final class AppModel {
 
         pendingHotkeyTrigger = true
         _ = windowFocusService.focus(targetWindow)
+        if centerMouseOnFocus {
+            CGWarpMouseCursorPosition(CGPoint(x: targetWindow.frame.midX, y: targetWindow.frame.midY))
+            CGAssociateMouseAndMouseCursorPosition(1)
+        }
         scheduleRefresh(delay: 0.08)
     }
 

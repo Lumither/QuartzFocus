@@ -5,6 +5,7 @@ final class FocusModeStore {
         static let borderEnabled = "borderEnabled"
         static let borderPolicy = "borderPolicy"
         static let borderTrigger = "borderTrigger"
+        static let centerMouseOnFocus = "centerMouseOnFocus"
         static let dimEnabled = "dimEnabled"
         static let dimOpacity = "dimOpacity"
         static let hotkeys = "hotkeys"
@@ -83,6 +84,14 @@ final class FocusModeStore {
         let stringKeyed = Dictionary(uniqueKeysWithValues: hotkeys.map { ($0.key.rawValue, $0.value) })
         guard let data = try? JSONEncoder().encode(stringKeyed) else { return }
         defaults.set(data, forKey: Keys.hotkeys)
+    }
+
+    var centerMouseOnFocus: Bool {
+        defaults.bool(forKey: Keys.centerMouseOnFocus)
+    }
+
+    func setCenterMouseOnFocus(_ enabled: Bool) {
+        defaults.set(enabled, forKey: Keys.centerMouseOnFocus)
     }
 
     var statusBarVisible: Bool {
