@@ -25,8 +25,12 @@ private enum DockSwipe {
 }
 
 final class WorkspaceSwitcher {
-    func move(_ direction: WorkspaceMove) {
+    static let instantVelocity: Double = 9999.0
+
+    func move(_ direction: WorkspaceMove, count: Int = 1, velocity: Double? = nil) {
+        guard count > 0 else { return }
         let sign: Double = direction == .next ? 1.0 : -1.0
+        let velocityMagnitude = velocity ?? DockSwipe.velocityMagnitude
 
         guard let event = CGEvent(source: nil) else {
             fputs("WorkspaceSwitcher: failed to create CGEvent\n", stderr)
@@ -37,12 +41,13 @@ final class WorkspaceSwitcher {
         CGEventSetIntegerValueFieldRaw(event, DockSwipe.gestureHIDTypeField, DockSwipe.dockSwipeHIDType)
         CGEventSetIntegerValueFieldRaw(event, DockSwipe.swipeMotionField, DockSwipe.horizontalMotion)
         CGEventSetDoubleValueFieldRaw(event, DockSwipe.swipeProgressField, sign)
-        CGEventSetDoubleValueFieldRaw(event, DockSwipe.swipeVelocityXField, sign * DockSwipe.velocityMagnitude)
+        CGEventSetDoubleValueFieldRaw(event, DockSwipe.swipeVelocityXField, sign * velocityMagnitude)
 
-        CGEventSetIntegerValueFieldRaw(event, DockSwipe.phaseField, DockSwipe.phaseBegan)
-        event.post(tap: .cgSessionEventTap)
-
-        CGEventSetIntegerValueFieldRaw(event, DockSwipe.phaseField, DockSwipe.phaseEnded)
-        event.post(tap: .cgSessionEventTap)
+        for _ in 0..<count {
+            CGEventSetIntegerValueFieldRaw(event, DockSwipe.phaseField, DockSwipe.phaseBegan)
+            event.post(tap: .cgSessionEventTap)
+            CGEventSetIntegerValueFieldRaw(event, DockSwipe.phaseField, DockSwipe.phaseEnded)
+            event.post(tap: .cgSessionEventTap)
+        }
     }
 }

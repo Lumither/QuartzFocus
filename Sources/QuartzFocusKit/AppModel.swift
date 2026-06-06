@@ -23,6 +23,12 @@ public final class AppModel {
     @ObservationIgnored private let accessibilityObserverManager = AccessibilityObserverManager()
     @ObservationIgnored private let workspaceSwitcher = WorkspaceSwitcher()
     @ObservationIgnored private let dockNotifier = DockNotifier()
+    @ObservationIgnored private lazy var overviewPicker = OverviewPicker(
+        dockNotifier: dockNotifier,
+        windowDiscoveryService: windowDiscoveryService,
+        windowFocusService: windowFocusService,
+        workspaceSwitcher: workspaceSwitcher
+    )
 
     @ObservationIgnored private var visualState = FocusVisualState.standard
     @ObservationIgnored private var refreshTimer: Timer?
@@ -254,9 +260,9 @@ public final class AppModel {
             workspaceSwitcher.move(move)
             scheduleRefresh(delay: 0.2)
         } else if action == .missionControl {
-            dockNotifier.showMissionControl()
+            overviewPicker.toggle(.missionControl)
         } else if action == .appExpose {
-            dockNotifier.showAppExpose()
+            overviewPicker.toggle(.appExpose)
         }
     }
 
