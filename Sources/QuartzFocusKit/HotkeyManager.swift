@@ -3,11 +3,11 @@ import Foundation
 
 enum HotkeyManagerError: Error {
     case installHandler(OSStatus)
-    case registerHotKey(OSStatus, Direction)
+    case registerHotKey(OSStatus, HotkeyAction)
 }
 
 final class HotkeyManager {
-    var onDirection: ((Direction) -> Void)?
+    var onAction: ((HotkeyAction) -> Void)?
 
     private static let signature: OSType = 0x5146_4F43  // "QFOC"
     private static let eventHandler: EventHandlerUPP = { _, event, userData in
@@ -26,14 +26,14 @@ final class HotkeyManager {
         unregisterAll()
     }
 
-    func register(bindings: [Direction: HotkeyBinding]) throws {
+    func register(bindings: [HotkeyAction: HotkeyBinding]) throws {
         try installEventHandlerIfNeeded()
         unregisterHotkeys()
 
-        for direction in Direction.allCases {
-            guard let binding = bindings[direction] else { continue }
-            let identifier = Self.identifier(for: direction)
-            try register(direction: direction, identifier: identifier, binding: binding)
+        for action in HotkeyAction.allCases {
+            guard let binding = bindings[action] else { continue }
+            let identifier = Self.identifier(for: action)
+            try register(action: action, identifier: identifier, binding: binding)
         }
     }
 
@@ -41,12 +41,16 @@ final class HotkeyManager {
         unregisterHotkeys()
     }
 
-    private static func identifier(for direction: Direction) -> UInt32 {
-        switch direction {
-        case .left: return 1
-        case .down: return 2
-        case .up: return 3
-        case .right: return 4
+    private static func identifier(for action: HotkeyAction) -> UInt32 {
+        switch action {
+        case .focusLeft: return 1
+        case .focusDown: return 2
+        case .focusUp: return 3
+        case .focusRight: return 4
+        case .workspaceNext: return 5
+        case .workspacePrevious: return 6
+        case .missionControl: return 7
+        case .appExpose: return 8
         }
     }
 
@@ -74,7 +78,7 @@ final class HotkeyManager {
         }
     }
 
-    private func register(direction: Direction, identifier: UInt32, binding: HotkeyBinding) throws {
+    private func register(action: HotkeyAction, identifier: UInt32, binding: HotkeyBinding) throws {
         var hotKeyRef: EventHotKeyRef?
         let hotKeyID = EventHotKeyID(signature: Self.signature, id: identifier)
 
@@ -88,7 +92,7 @@ final class HotkeyManager {
         )
 
         guard status == noErr, let hotKeyRef else {
-            throw HotkeyManagerError.registerHotKey(status, direction)
+            throw HotkeyManagerError.registerHotKey(status, action)
         }
 
         hotKeyRefs[identifier] = hotKeyRef
@@ -106,26 +110,25 @@ final class HotkeyManager {
             &hotKeyID
         )
 
-        guard status == noErr, let direction = direction(for: hotKeyID.id) else {
+        guard status == noErr, let action = action(for: hotKeyID.id) else {
             return OSStatus(eventNotHandledErr)
         }
 
-        onDirection?(direction)
+        onAction?(action)
         return noErr
     }
 
-    private func direction(for identifier: UInt32) -> Direction? {
+    private func action(for identifier: UInt32) -> HotkeyAction? {
         switch identifier {
-        case 1:
-            return .left
-        case 2:
-            return .down
-        case 3:
-            return .up
-        case 4:
-            return .right
-        default:
-            return nil
+        case 1: return .focusLeft
+        case 2: return .focusDown
+        case 3: return .focusUp
+        case 4: return .focusRight
+        case 5: return .workspaceNext
+        case 6: return .workspacePrevious
+        case 7: return .missionControl
+        case 8: return .appExpose
+        default: return nil
         }
     }
 

@@ -81,13 +81,13 @@ struct SettingsView: View {
             }
 
             Section {
-                ForEach(Direction.allCases, id: \.self) { direction in
+                ForEach(HotkeyAction.allCases, id: \.self) { action in
                     HStack {
-                        Text(directionTitle(direction))
+                        Text(actionTitle(action))
                         Spacer()
                         HotkeyRecorderView(
-                            binding: model.hotkeys[direction],
-                            onChange: { model.setHotkey(direction, $0) },
+                            binding: model.hotkeys[action],
+                            onChange: { model.setHotkey(action, $0) },
                             onRecordingChange: { model.setHotkeyRecording($0) }
                         )
                         .frame(width: 160, height: 24)
@@ -124,12 +124,16 @@ struct SettingsView: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    private func directionTitle(_ direction: Direction) -> String {
-        switch direction {
-        case .left: return "Left"
-        case .down: return "Down"
-        case .up: return "Up"
-        case .right: return "Right"
+    private func actionTitle(_ action: HotkeyAction) -> String {
+        switch action {
+        case .focusLeft: return "Focus left"
+        case .focusDown: return "Focus down"
+        case .focusUp: return "Focus up"
+        case .focusRight: return "Focus right"
+        case .workspaceNext: return "Next workspace"
+        case .workspacePrevious: return "Previous workspace"
+        case .missionControl: return "Mission Control"
+        case .appExpose: return "App Exposé"
         }
     }
 }

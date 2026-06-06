@@ -1,6 +1,49 @@
 import AppKit
 import Carbon
 
+public enum WorkspaceMove: String, CaseIterable, Codable, Sendable {
+    case next
+    case previous
+}
+
+public enum HotkeyAction: String, CaseIterable, Codable, Sendable {
+    case focusLeft
+    case focusDown
+    case focusUp
+    case focusRight
+    case workspaceNext
+    case workspacePrevious
+    case missionControl
+    case appExpose
+
+    public var direction: Direction? {
+        switch self {
+        case .focusLeft: return .left
+        case .focusDown: return .down
+        case .focusUp: return .up
+        case .focusRight: return .right
+        default: return nil
+        }
+    }
+
+    public var workspace: WorkspaceMove? {
+        switch self {
+        case .workspaceNext: return .next
+        case .workspacePrevious: return .previous
+        default: return nil
+        }
+    }
+
+    public static func direction(_ direction: Direction) -> HotkeyAction {
+        switch direction {
+        case .left: return .focusLeft
+        case .down: return .focusDown
+        case .up: return .focusUp
+        case .right: return .focusRight
+        }
+    }
+}
+
 public struct HotkeyBinding: Equatable, Codable, Sendable {
     public var keyCode: UInt32
     public var carbonModifiers: UInt32
@@ -79,26 +122,46 @@ public struct HotkeyBinding: Equatable, Codable, Sendable {
 }
 
 extension HotkeyBinding {
-    public static let defaults: [Direction: HotkeyBinding] = [
-        .left: HotkeyBinding(
+    public static let defaults: [HotkeyAction: HotkeyBinding] = [
+        .focusLeft: HotkeyBinding(
             keyCode: UInt32(kVK_ANSI_H),
-            carbonModifiers: UInt32(controlKey) | UInt32(optionKey),
+            carbonModifiers: UInt32(optionKey),
             character: "h"
         ),
-        .down: HotkeyBinding(
+        .focusDown: HotkeyBinding(
             keyCode: UInt32(kVK_ANSI_J),
-            carbonModifiers: UInt32(controlKey) | UInt32(optionKey),
+            carbonModifiers: UInt32(optionKey),
             character: "j"
         ),
-        .up: HotkeyBinding(
+        .focusUp: HotkeyBinding(
             keyCode: UInt32(kVK_ANSI_K),
-            carbonModifiers: UInt32(controlKey) | UInt32(optionKey),
+            carbonModifiers: UInt32(optionKey),
             character: "k"
         ),
-        .right: HotkeyBinding(
+        .focusRight: HotkeyBinding(
             keyCode: UInt32(kVK_ANSI_L),
-            carbonModifiers: UInt32(controlKey) | UInt32(optionKey),
+            carbonModifiers: UInt32(optionKey),
             character: "l"
+        ),
+        .workspaceNext: HotkeyBinding(
+            keyCode: UInt32(kVK_ANSI_U),
+            carbonModifiers: UInt32(optionKey),
+            character: "u"
+        ),
+        .workspacePrevious: HotkeyBinding(
+            keyCode: UInt32(kVK_ANSI_I),
+            carbonModifiers: UInt32(optionKey),
+            character: "i"
+        ),
+        .missionControl: HotkeyBinding(
+            keyCode: UInt32(kVK_ANSI_O),
+            carbonModifiers: UInt32(optionKey),
+            character: "o"
+        ),
+        .appExpose: HotkeyBinding(
+            keyCode: UInt32(kVK_ANSI_P),
+            carbonModifiers: UInt32(optionKey),
+            character: "p"
         ),
     ]
 }

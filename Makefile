@@ -50,11 +50,22 @@ run:
 open: app
 	open $(APP_BUNDLE)
 
+.PHONY: probe-mc
+probe-mc:
+	swift scripts/probe-mission-control.swift
+
 .PHONY: wipe-tcc
 wipe-tcc:
 	-killall $(APP_NAME) 2>/dev/null
 	tccutil reset Accessibility $(BUNDLE_ID)
 	@echo "TCC Accessibility reset for $(BUNDLE_ID). Re-grant on next launch."
+
+.PHONY: wipe-config
+wipe-config:
+	-killall $(APP_NAME) 2>/dev/null
+	defaults delete $(BUNDLE_ID) 2>/dev/null || true
+	defaults delete $(APP_NAME) 2>/dev/null || true
+	@echo "User defaults cleared for $(BUNDLE_ID). Defaults will reset on next launch."
 
 .PHONY: clean
 clean:
@@ -78,5 +89,7 @@ help:
 	@echo "  make fmt      Format Swift sources in place (swift format)"
 	@echo "  make run      swift run $(APP_NAME) (dev mode, no bundle)"
 	@echo ""
-	@echo "  make wipe-tcc Quit app and reset Accessibility grant for $(BUNDLE_ID)"
-	@echo "  make clean    Remove .build and generated icon"
+	@echo "  make wipe-tcc    Quit app and reset Accessibility grant for $(BUNDLE_ID)"
+	@echo "  make wipe-config Quit app and clear stored UserDefaults (hotkeys, prefs)"
+	@echo "  make probe-mc    Open MC and dump CGWindowList frames to compare positions"
+	@echo "  make clean       Remove .build and generated icon"

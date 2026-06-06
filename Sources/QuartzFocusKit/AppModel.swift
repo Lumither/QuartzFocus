@@ -11,7 +11,7 @@ public final class AppModel {
     public private(set) var centerMouseOnFocus: Bool = false
     public private(set) var statusBarVisible: Bool = true
     public private(set) var permissionGranted: Bool = false
-    public private(set) var hotkeys: [Direction: HotkeyBinding] = HotkeyBinding.defaults
+    public private(set) var hotkeys: [HotkeyAction: HotkeyBinding] = HotkeyBinding.defaults
     public private(set) var launchAtLoginEnabled: Bool = false
 
     @ObservationIgnored private let focusModeStore = FocusModeStore()
@@ -21,6 +21,8 @@ public final class AppModel {
     @ObservationIgnored private let windowFocusService = WindowFocusService()
     @ObservationIgnored private let overlayManager = OverlayManager()
     @ObservationIgnored private let accessibilityObserverManager = AccessibilityObserverManager()
+    @ObservationIgnored private let workspaceSwitcher = WorkspaceSwitcher()
+    @ObservationIgnored private let dockNotifier = DockNotifier()
 
     @ObservationIgnored private var visualState = FocusVisualState.standard
     @ObservationIgnored private var refreshTimer: Timer?
@@ -62,9 +64,9 @@ public final class AppModel {
     }
 
     private func configureCallbacks() {
-        hotkeyManager.onDirection = { [weak self] direction in
+        hotkeyManager.onAction = { [weak self] action in
             Task { @MainActor [weak self] in
-                self?.handle(direction: direction)
+                self?.handle(action: action)
             }
         }
 
@@ -108,8 +110,8 @@ public final class AppModel {
         scheduleRefresh(delay: 0)
     }
 
-    public func setHotkey(_ direction: Direction, _ binding: HotkeyBinding) {
-        hotkeys[direction] = binding
+    public func setHotkey(_ action: HotkeyAction, _ binding: HotkeyBinding) {
+        hotkeys[action] = binding
         focusModeStore.setHotkeys(hotkeys)
         registerHotkeys()
     }
@@ -242,6 +244,19 @@ public final class AppModel {
             stopRefreshTimer()
             accessibilityObserverManager.detach()
             overlayManager.hideAll()
+        }
+    }
+
+    private func handle(action: HotkeyAction) {
+        if let direction = action.direction {
+            handle(direction: direction)
+        } else if let move = action.workspace {
+            workspaceSwitcher.move(move)
+            scheduleRefresh(delay: 0.2)
+        } else if action == .missionControl {
+            dockNotifier.showMissionControl()
+        } else if action == .appExpose {
+            dockNotifier.showAppExpose()
         }
     }
 

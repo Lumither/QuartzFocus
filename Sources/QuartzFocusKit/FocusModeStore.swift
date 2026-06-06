@@ -65,7 +65,7 @@ final class FocusModeStore {
         defaults.set(Double(opacity), forKey: Keys.dimOpacity)
     }
 
-    var hotkeys: [Direction: HotkeyBinding] {
+    var hotkeys: [HotkeyAction: HotkeyBinding] {
         var result = HotkeyBinding.defaults
         guard let data = defaults.data(forKey: Keys.hotkeys),
             let decoded = try? JSONDecoder().decode([String: HotkeyBinding].self, from: data)
@@ -73,14 +73,16 @@ final class FocusModeStore {
             return result
         }
         for (key, value) in decoded {
-            if let direction = Direction(rawValue: key) {
-                result[direction] = value
+            if let action = HotkeyAction(rawValue: key) {
+                result[action] = value
+            } else if let direction = Direction(rawValue: key) {
+                result[HotkeyAction.direction(direction)] = value
             }
         }
         return result
     }
 
-    func setHotkeys(_ hotkeys: [Direction: HotkeyBinding]) {
+    func setHotkeys(_ hotkeys: [HotkeyAction: HotkeyBinding]) {
         let stringKeyed = Dictionary(uniqueKeysWithValues: hotkeys.map { ($0.key.rawValue, $0.value) })
         guard let data = try? JSONEncoder().encode(stringKeyed) else { return }
         defaults.set(data, forKey: Keys.hotkeys)
