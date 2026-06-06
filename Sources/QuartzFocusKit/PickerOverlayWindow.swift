@@ -96,7 +96,8 @@ private final class PickerOverlayView: NSView {
     private func renderHints(entries: [HintEntry], prefix: String, screen: NSScreen) {
         for entry in entries {
             guard entry.hint.hasPrefix(prefix) else { continue }
-            guard let pos = local(point: CGPoint(x: entry.mcFrame.midX, y: entry.mcFrame.midY), screen: screen)
+            guard
+                let pos = local(point: CGPoint(x: entry.mcFrame.midX, y: entry.mcFrame.midY), screen: screen)
             else { continue }
             let label = makeHintLabel(text: entry.hint, prefix: prefix)
             let labelSize = label.bounds.size
@@ -145,9 +146,12 @@ private final class PickerOverlayView: NSView {
         let remainingColor = NSColor.white
         for (i, ch) in text.enumerated() {
             let color = i < prefix.count ? matchedColor : remainingColor
-            result.append(NSAttributedString(string: String(ch), attributes: [
-                .font: font, .foregroundColor: color,
-            ]))
+            result.append(
+                NSAttributedString(
+                    string: String(ch),
+                    attributes: [
+                        .font: font, .foregroundColor: color,
+                    ]))
         }
         return result
     }
@@ -179,7 +183,8 @@ private final class PickerOverlayView: NSView {
         let originX = (bounds.width - backdropWidth) / 2
         let originY: CGFloat = bounds.height - backdropHeight - 60
 
-        searchBackdropLayer.frame = CGRect(x: originX, y: originY, width: backdropWidth, height: backdropHeight)
+        searchBackdropLayer.frame = CGRect(
+            x: originX, y: originY, width: backdropWidth, height: backdropHeight)
         searchBarLayer.frame = CGRect(
             x: originX + padding, y: originY + padding / 2,
             width: backdropWidth - padding * 2, height: size.height

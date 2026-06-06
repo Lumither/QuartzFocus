@@ -151,8 +151,6 @@ public final class OverviewPicker {
         return result
     }
 
-
-
     private func sendOpenNotification(mode: Mode) {
         switch mode {
         case .missionControl: dockNotifier.showMissionControl()
@@ -185,12 +183,13 @@ public final class OverviewPicker {
         state = .hint(prefix: "")
     }
 
-
     private func buildEntries(
         snapshot: [WindowCandidate], frames: [CGWindowID: CGRect]
     ) -> [HintEntry] {
         var seen: Set<CGWindowID> = []
-        var pairs: [(candidate: WindowCandidate?, windowID: CGWindowID, pid: pid_t, frame: CGRect, title: String)] = []
+        var pairs:
+            [(candidate: WindowCandidate?, windowID: CGWindowID, pid: pid_t, frame: CGRect, title: String)] =
+                []
 
         for c in snapshot {
             guard let frame = frames[c.windowID] else { continue }
@@ -434,7 +433,8 @@ public final class OverviewPicker {
     private func characterFor(event: CGEvent) -> Character? {
         var actualLength: Int = 0
         var chars = [UniChar](repeating: 0, count: 4)
-        event.keyboardGetUnicodeString(maxStringLength: 4, actualStringLength: &actualLength, unicodeString: &chars)
+        event.keyboardGetUnicodeString(
+            maxStringLength: 4, actualStringLength: &actualLength, unicodeString: &chars)
         guard actualLength > 0 else { return nil }
         let s = String(utf16CodeUnits: chars, count: actualLength)
         return s.first

@@ -110,6 +110,8 @@ for w in during {
     if b.rect == w.rect { continue }
     changed += 1
     let ownerCol = pad(w.owner, 22)
-    print("  id=\(pad(String(w.id), 8)) owner=\(ownerCol)  before=\(rectStr(b.rect))  during=\(rectStr(w.rect))")
+    print(
+        "  id=\(pad(String(w.id), 8)) owner=\(ownerCol)  before=\(rectStr(b.rect))  during=\(rectStr(w.rect))"
+    )
 }
 print(">> \(changed) window(s) changed frame while MC was active")
